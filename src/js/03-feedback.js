@@ -1,39 +1,48 @@
 import throttle from 'lodash.throttle';
 
-const form = document.querySelector('.feedback-form');
-const emailInput = form.querySelector('input[name="email"]');
-const messageInput = form.querySelector('textarea[name="message"]');
+const feedbackForm = document.querySelector('.feedback-form');
+const emailInput = document.querySelector('input[name="email"]');
+const messageTextarea = document.querySelector('textarea[name="message"]');
 
+// Function to save form state to local storage
 const saveFormState = throttle(() => {
   const formState = {
     email: emailInput.value,
-    message: messageInput.value,
+    message: messageTextarea.value,
   };
+
   localStorage.setItem('feedback-form-state', JSON.stringify(formState));
 }, 500);
 
+// Function to load form state from local storage
 const loadFormState = () => {
   const storedState = localStorage.getItem('feedback-form-state');
   if (storedState) {
-    const { email, message } = JSON.parse(storedState);
-    emailInput.value = email;
-    messageInput.value = message;
+    const parsedState = JSON.parse(storedState);
+    emailInput.value = parsedState.email || '';
+    messageTextarea.value = parsedState.message || '';
   }
 };
 
+// Function to handle form submission
 const handleSubmit = event => {
   event.preventDefault();
   const formState = {
     email: emailInput.value,
-    message: messageInput.value,
+    message: messageTextarea.value,
   };
-  console.log('Form submitted with data:', formState);
 
+  // Clear form state from local storage
   localStorage.removeItem('feedback-form-state');
+
+  // Display form state in the console
+  console.log('Form submitted with state:', formState);
 };
 
+// Add event listeners
 emailInput.addEventListener('input', saveFormState);
-messageInput.addEventListener('input', saveFormState);
-form.addEventListener('submit', handleSubmit);
+messageTextarea.addEventListener('input', saveFormState);
+feedbackForm.addEventListener('submit', handleSubmit);
 
+// Load form state on page load
 loadFormState();
